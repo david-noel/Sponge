@@ -22,17 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mod.interfaces;
+package org.spongepowered.mod.mixin.core.world.biome;
 
-import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
-import org.spongepowered.api.world.gen.Populator;
-import net.minecraft.world.storage.WorldInfo;
-import org.spongepowered.mod.configuration.SpongeConfig;
+import java.util.Random;
 
-public interface IMixinWorld extends IPopulatorOwner {
+import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenMesa;
+import net.minecraft.world.chunk.ChunkPrimer;
 
-    SpongeConfig<SpongeConfig.WorldConfig> getWorldConfig();
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.mod.world.gen.populators.MesaBiomeGeneratorPopulator;
 
-    void setWorldInfo(WorldInfo worldInfo);
+@Mixin(BiomeGenMesa.class)
+public abstract class MixinBiomeGenMesa extends MixinBiomeGenBase {
+
+    @Inject(method = "<init>(IZZ)V", at = @At("RETURN"))
+    public void onConstructed(int id, boolean mesa, boolean trees, CallbackInfo ci) {
+        this.genpopulators.add(new MesaBiomeGeneratorPopulator(mesa, trees));
+    }
+
+    @Inject(method = "genTerrainBlocks(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/world/chunk/ChunkPrimer;IID)V", at = @At("HEAD"), cancellable = true)
+    public void genTerrainBlocks(World worldIn, Random p_180622_2_, ChunkPrimer p_180622_3_, int p_180622_4_, int p_180622_5_, double p_180622_6_,
+            CallbackInfo ci) {
+        ci.cancel();
+    }
+
 }

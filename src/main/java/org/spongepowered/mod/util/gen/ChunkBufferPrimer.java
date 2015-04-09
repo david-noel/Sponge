@@ -22,17 +22,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mod.interfaces;
+package org.spongepowered.mod.util.gen;
 
-import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
-import org.spongepowered.api.world.gen.Populator;
-import net.minecraft.world.storage.WorldInfo;
-import org.spongepowered.mod.configuration.SpongeConfig;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.world.chunk.ChunkPrimer;
 
-public interface IMixinWorld extends IPopulatorOwner {
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.util.gen.MutableBlockBuffer;
 
-    SpongeConfig<SpongeConfig.WorldConfig> getWorldConfig();
+public class ChunkBufferPrimer extends ChunkPrimer {
 
-    void setWorldInfo(WorldInfo worldInfo);
+    private final MutableBlockBuffer buffer;
+
+    public ChunkBufferPrimer(MutableBlockBuffer buffer) {
+        this.buffer = buffer;
+    }
+
+    public IBlockState getBlockState(int x, int y, int z) {
+        return (IBlockState) buffer.getBlock(x + buffer.getBlockMin().getX(), y + buffer.getBlockMin().getY(), z + buffer.getBlockMin().getZ());
+    }
+
+    public IBlockState getBlockState(int index) {
+        return getBlockState((index >> 12) & 0xf, (index) & 0xff, (index >> 8) & 0xf);
+    }
+
+    public void setBlockState(int x, int y, int z, IBlockState state) {
+        this.buffer.setBlock(x + buffer.getBlockMin().getX(), y + buffer.getBlockMin().getY(), z + buffer.getBlockMin().getZ(), (BlockState) state);
+    }
+
+    public void setBlockState(int index, IBlockState state) {
+        setBlockState((index >> 12) & 0xf, (index) & 0xff, (index >> 8) & 0xf, state);
+    }
+
 }

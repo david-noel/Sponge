@@ -70,7 +70,7 @@ public final class CustomChunkProviderGenerate implements IChunkProvider {
      * @param biomeGenerator Biome generator used to generate chunks.
      * @return The chunk generator.
      * @throws IllegalArgumentException If the generator populator cannot be
-     *         bound to the given world.
+     *             bound to the given world.
      */
     public static IChunkProvider of(World world, GeneratorPopulator generatorPopulator, BiomeGenerator biomeGenerator) {
         if (generatorPopulator instanceof SpongeGeneratorPopulator) {
@@ -112,8 +112,7 @@ public final class CustomChunkProviderGenerate implements IChunkProvider {
     @Override
     public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos) {
         BiomeGenBase biome = this.world.getBiomeGenForCoords(pos);
-        @SuppressWarnings("unchecked")
-        List<SpawnListEntry> creatures = biome.getSpawnableList(creatureType);
+        @SuppressWarnings("unchecked") List<SpawnListEntry> creatures = biome.getSpawnableList(creatureType);
         return creatures;
     }
 
@@ -130,7 +129,7 @@ public final class CustomChunkProviderGenerate implements IChunkProvider {
 
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
-
+        
         // Generate biomes
         this.cachedBiomes.reuse(new Vector2i(chunkX * 16, chunkZ * 16));
         this.biomeGenerator.generateBiomes(this.cachedBiomes);
@@ -138,7 +137,7 @@ public final class CustomChunkProviderGenerate implements IChunkProvider {
         // Generate blocks
         ChunkPrimer chunkprimer = new ChunkPrimer();
         ChunkPrimerBuffer buffer = new ChunkPrimerBuffer(chunkprimer, chunkZ, chunkZ);
-        this.generatorPopulator.populate(buffer, this.cachedBiomes.getImmutableClone());
+        this.generatorPopulator.populate((org.spongepowered.api.world.World) world, buffer, this.cachedBiomes.getImmutableClone(), world.getSeed());
 
         // Assemble chunk
         Chunk chunk = new Chunk(this.world, chunkprimer, chunkX, chunkZ);

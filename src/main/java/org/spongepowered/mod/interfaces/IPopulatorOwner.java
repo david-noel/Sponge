@@ -24,15 +24,15 @@
  */
 package org.spongepowered.mod.interfaces;
 
-import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.api.world.gen.Populator;
-import net.minecraft.world.storage.WorldInfo;
-import org.spongepowered.mod.configuration.SpongeConfig;
 
-public interface IMixinWorld extends IPopulatorOwner {
+import com.google.common.collect.ImmutableList;
 
-    SpongeConfig<SpongeConfig.WorldConfig> getWorldConfig();
+public interface IPopulatorOwner {
 
-    void setWorldInfo(WorldInfo worldInfo);
+    ImmutableList<Populator> getPopulators();
+
+    ImmutableList<GeneratorPopulator> getGeneratorPopulators();
+
 }

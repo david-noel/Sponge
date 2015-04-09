@@ -22,17 +22,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.mod.interfaces;
+package org.spongepowered.mod.mixin.core.world.gen;
 
-import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
-import org.spongepowered.api.world.gen.Populator;
-import net.minecraft.world.storage.WorldInfo;
-import org.spongepowered.mod.configuration.SpongeConfig;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.ChunkProviderEnd;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 
-public interface IMixinWorld extends IPopulatorOwner {
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 
-    SpongeConfig<SpongeConfig.WorldConfig> getWorldConfig();
+@Mixin(ChunkProviderEnd.class)
+public abstract class MixinChunkProviderEnd implements IChunkProvider {
 
-    void setWorldInfo(WorldInfo worldInfo);
+    @Shadow private int chunkX;
+    @Shadow private int chunkZ;
+    @Shadow private World endWorld;
+
+    /*
+     * We overwrite this function with just the forge event call as the
+     * functionality of replacing the stone blocks with end stone has been moved
+     * to a genpop attached to BiomeGenEnd.
+     */
+    @Overwrite
+    public void func_180519_a(ChunkPrimer p_180519_1_) {
+        ChunkProviderEvent.ReplaceBiomeBlocks event = new ChunkProviderEvent.ReplaceBiomeBlocks(this, chunkX, chunkZ, p_180519_1_, this.endWorld);
+        MinecraftForge.EVENT_BUS.post(event);
+    }
+
 }
